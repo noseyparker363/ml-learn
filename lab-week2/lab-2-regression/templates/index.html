@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐧 Penguin Weight Predictor - ML Demo Interface</title>
+    <!-- นำเข้า Google Fonts (Inter & Prompt) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Prompt:wght@200;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0b132b;
+            --card-bg: rgba(28, 37, 65, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-primary: #00b4d8; /* Ice Blue */
+            --accent-gradient: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --indicator-color: #06d6a0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Prompt', 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(0, 180, 216, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(90, 24, 154, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 2.5rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            padding: 2.5rem;
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 1.5rem;
+                gap: 1.5rem;
+            }
+        }
+
+        /* หัวเรื่อง */
+        .header {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2.3rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ฟอร์มคุณลักษณะนกเพนกวิน */
+        .form-section h2 {
+            font-size: 1.35rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(11, 19, 43, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 0.85rem 1.1rem;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.2);
+        }
+
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .range-val {
+            min-width: 65px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        /* ปุ่มเริ่มคำนวณ */
+        .btn-predict {
+            width: 100%;
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            padding: 1.1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 10px 20px -5px rgba(0, 180, 216, 0.3);
+            margin-top: 1rem;
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 30px -8px rgba(0, 180, 216, 0.45);
+        }
+
+        /* ฝั่งแสดงผลลัพธ์ (ตราชั่งน้ำหนักจำลอง) */
+        .result-section {
+            border-left: 1px solid var(--border-color);
+            padding-left: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 350px;
+        }
+
+        @media (max-width: 768px) {
+            .result-section {
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+                padding-left: 0;
+                padding-top: 2.5rem;
+            }
+        }
+
+        .result-placeholder {
+            text-align: center;
+            color: var(--text-muted);
+            animation: pulse 2.5s infinite;
+        }
+
+        .result-placeholder svg {
+            width: 72px;
+            height: 72px;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+            color: var(--accent-primary);
+        }
+
+        .result-card {
+            width: 100%;
+            text-align: center;
+            display: none;
+            animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ตราชั่งจำลองแบบตัวเลขดิจิตอล */
+        .scale-display {
+            background: rgba(11, 19, 43, 0.8);
+            border: 2px solid var(--accent-primary);
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 20px rgba(0, 180, 216, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scale-display::before {
+            content: "DIGITAL BALANCE SCALE";
+            position: absolute;
+            top: 0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            color: var(--accent-primary);
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        .scale-weight {
+            font-size: 3.2rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            color: var(--indicator-color);
+            text-shadow: 0 0 10px rgba(6, 214, 160, 0.3);
+            margin: 0.5rem 0;
+        }
+
+        .scale-unit {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .comparison-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            margin-top: 1rem;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        /* การ์ดทฤษฎีอธิบายความรู้ */
+        .info-card {
+            grid-column: 1 / -1;
+            margin-top: 2rem;
+            background: rgba(11, 19, 43, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.8rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .info-card h3 {
+            color: var(--accent-primary);
+            margin-bottom: 0.8rem;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card ul {
+            list-style: none;
+            padding-left: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-card li {
+            position: relative;
+            padding-left: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .info-card li::before {
+            content: "✦";
+            color: var(--accent-primary);
+            position: absolute;
+            left: 0;
+        }
+
+        /* แอนิเมชันประกอบ */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.02); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        .spinner {
+            display: none;
+            width: 25px;
+            height: 25px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- ส่วนหัวเรื่อง -->
+    <div class="header">
+        <h1>🐧 Penguin Weight Predictor</h1>
+        <p>เว็บจำลองทำนายค่าน้ำหนักจริงของนกเพนกวินสำหรับบทเรียน Regression (Lab 2: Penguins Regression Demo UI)</p>
+    </div>
+
+    <!-- ส่วนป้อนข้อมูลฟอร์มด้านซ้าย -->
+    <div class="form-section">
+        <h2>📝 สัดส่วนสรีระของนกเพนกวิน</h2>
+        <form id="penguinForm">
+            <!-- 1. สายพันธุ์ -->
+            <div class="form-group">
+                <label for="species">สายพันธุ์ของนกเพนกวิน (Species - Categorical Feature)</label>
+                <select class="form-control" id="species" required>
+                    <option value="Adelie" selected>อเดลี (Adelie - ตัวเล็ก)</option>
+                    <option value="Chinstrap">ชินสแตรป (Chinstrap)</option>
+                    <option value="Gentoo">เจนตู (Gentoo - ตัวใหญ่สุด)</option>
+                </select>
+            </div>
+
+            <!-- 2. เกาะที่อยู่อาศัย -->
+            <div class="form-group">
+                <label for="island">เกาะที่อยู่อาศัย (Island - Categorical Feature)</label>
+                <select class="form-control" id="island" required>
+                    <option value="Torgersen" selected>Torgersen</option>
+                    <option value="Biscoe">Biscoe</option>
+                    <option value="Dream">Dream</option>
+                </select>
+            </div>
+
+            <!-- 3. ความยาวจะงอยปาก -->
+            <div class="form-group">
+                <label for="billLength">ความยาวจะงอยปาก (Bill Length - mm)</label>
+                <div class="range-container">
+                    <input type="range" class="form-control" id="billLength" min="30" max="60" value="44" step="0.1" style="padding: 0; height: 8px;">
+                    <span class="range-val" id="billLengthVal">44.0 มม.</span>
+                </div>
+            </div>
+
+            <!-- 4. ความหนาจะงอยปาก -->
+            <div class="form-group">
+                <label for="billDepth">ความหนาจะงอยปาก (Bill Depth - mm)</label>
+                <div class="range-container">
+                    <input type="range" class="form-control" id="billDepth" min="10" max="25" value="17" step="0.1" style="padding: 0; height: 8px;">
+                    <span class="range-val" id="billDepthVal">17.0 มม.</span>
+                </div>
+            </div>
+
+            <!-- 5. ความยาวครีบกระพือปีก -->
+            <div class="form-group">
+                <label for="flipperLength">ความยาวครีบกระพือปีก (Flipper Length - mm)</label>
+                <div class="range-container">
+                    <input type="range" class="form-control" id="flipperLength" min="170" max="240" value="200" style="padding: 0; height: 8px;">
+                    <span class="range-val" id="flipperLengthVal">200 มม.</span>
+                </div>
+            </div>
+
+            <!-- 6. เพศ -->
+            <div class="form-group">
+                <label for="sex">เพศ (Sex - Categorical Feature)</label>
+                <select class="form-control" id="sex" required>
+                    <option value="male" selected>เพศผู้ (Male)</option>
+                    <option value="female">เพศเมีย (Female)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-predict" id="submitBtn">
+                <span id="btnText">⚖️ วางนกเพนกวินบนตราชั่ง</span>
+                <div class="spinner" id="spinner"></div>
+            </button>
+        </form>
+    </div>
+
+    <!-- ส่วนแสดงตราชั่งจำลองด้านขวา -->
+    <div class="result-section">
+        <!-- แสดงก่อนคำนวณ -->
+        <div class="result-placeholder" id="placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+            </svg>
+            <p>กรอกข้อมูลสรีระนกเพนกวินตัวย่อย<br>แล้วกดวางบนตราชั่งเพื่อเริ่มทำนายค่าน้ำหนัก</p>
+        </div>
+
+        <!-- หน้าตราชั่งวิเคราะห์ -->
+        <div class="result-card" id="resultCard">
+            <div class="scale-display">
+                <div class="scale-weight" id="weightVal">0.00</div>
+                <div class="scale-unit">กิโลกรัม (kg) <span id="weightGramsVal" style="font-size: 0.9rem; color: var(--text-muted);">/ 0 กรัม (g)</span></div>
+            </div>
+
+            <h4 style="margin-bottom: 0.5rem; text-align: left; font-size: 0.95rem; color: var(--accent-primary);">📊 เปรียบเทียบตามมาตรฐานข้อมูล:</h4>
+            <div class="comparison-info" id="comparisonInfo">
+                ประมวลผลวิเคราะห์น้ำหนักเสร็จสิ้น
+            </div>
+        </div>
+    </div>
+
+    <!-- บล็อกอธิบายความรู้สำหรับวิชาเรียน -->
+    <div class="info-card">
+        <h3>💡 แนวคิดการพยากรณ์เชิงตัวเลข (Continuous Prediction Concept)</h3>
+        <p>โมเดลแล็บ Regression นี้ทำการคำนวณออกมาเป็นตัวเลขต่อเนื่องโดยมีขั้นตอนประกอบการทำงานดังนี้:</p>
+        <ul>
+            <li><strong>Continuous Target Value:</strong> แตกต่างกับโมเดลจำแนกประเภท (Classification) ตรงที่ผลลัพธ์ไม่ใช่ป้ายคลาส แต่เป็นตัวเลขที่มีสเกลละเอียดในหน่วยกรัม (เช่น 4,250 กรัม)</li>
+            <li><strong>Biological Realities:</strong> ในขั้นตอนสกัดระดับความสำคัญ โมเดลจะตีความค่าน้ำหนักที่มีสัดส่วนตามประเภทสรีระและสายพันธุ์ได้อย่างมีหลักเกณฑ์ เช่น นกเพนกวินพันธุ์ Gentoo จะมีสัมประสิทธิ์ความคลาดเคลื่อนเพิ่มขึ้นอย่างมากเมื่อเทียบกับสายพันธุ์อื่น</li>
+            <li><strong>Linear Combination & Trees:</strong> นักศึกษาสามารถเชื่อมโยงน้ำหนักความสำคัญเพื่อคำนวณหาน้ำหนักคร่าวๆ ได้โดยอาศัยค่าน้ำหนักบวกจากสมการทำนาย</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    const billLength = document.getElementById('billLength');
+    const billLengthVal = document.getElementById('billLengthVal');
+    const billDepth = document.getElementById('billDepth');
+    const billDepthVal = document.getElementById('billDepthVal');
+    const flipperLength = document.getElementById('flipperLength');
+    const flipperLengthVal = document.getElementById('flipperLengthVal');
+    
+    const form = document.getElementById('penguinForm');
+    const placeholder = document.getElementById('placeholder');
+    const resultCard = document.getElementById('resultCard');
+    
+    const weightVal = document.getElementById('weightVal');
+    const weightGramsVal = document.getElementById('weightGramsVal');
+    const comparisonInfo = document.getElementById('comparisonInfo');
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const spinner = document.getElementById('spinner');
+
+    // ลิงก์ข้อความสไลเดอร์
+    billLength.addEventListener('input', (e) => billLengthVal.textContent = parseFloat(e.target.value).toFixed(1) + ' มม.');
+    billDepth.addEventListener('input', (e) => billDepthVal.textContent = parseFloat(e.target.value).toFixed(1) + ' มม.');
+    flipperLength.addEventListener('input', (e) => flipperLengthVal.textContent = e.target.value + ' มม.');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        btnText.style.display = 'none';
+        spinner.style.display = 'block';
+        submitBtn.disabled = true;
+
+        const payload = {
+            species: document.getElementById('species').value,
+            island: document.getElementById('island').value,
+            bill_length_mm: parseFloat(billLength.value),
+            bill_depth_mm: parseFloat(billDepth.value),
+            flipper_length_mm: parseFloat(flipperLength.value),
+            sex: document.getElementById('sex').value
+        };
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                alert('เกิดข้อผิดพลาด: ' + result.error);
+                return;
+            }
+
+            placeholder.style.display = 'none';
+            resultCard.style.display = 'block';
+
+            // ดึงผลทำนาย
+            const massKg = result.predicted_mass_kg;
+            const massG = Math.round(result.predicted_mass_g);
+
+            // แอนิเมชันวิ่งตัวเลขน้ำหนัก (จาก 0 ถึง น้ำหนักจริง)
+            animateWeight(massKg, massG);
+
+            // เปรียบเทียบข้อมูลเฉลี่ยประกอบชีววิทยา
+            let avgNote = "";
+            if (payload.species === "Gentoo") {
+                avgNote = "นกเพนกวิน Gentoo ทั่วไปมีน้ำหนักเฉลี่ยอยู่ที่ประมาณ 4.5 - 5.5 kg ซึ่งเป็นสายพันธุ์ที่ขนาดใหญ่ที่สุดในแอนตาร์กติกา";
+            } else {
+                avgNote = "นกเพนกวิน Adelie และ Chinstrap ทั่วไปมีขนาดค่อนข้างเล็ก มีน้ำหนักตัวเฉลี่ยปกติอยู่ประมาณ 3.0 - 4.0 kg";
+            }
+            
+            comparisonInfo.innerHTML = `นกเพนกวินพันธุ์ <strong>${payload.species}</strong> เพศ <strong>${payload.sex === 'male' ? 'ผู้' : 'เมีย'}</strong> ตัวนี้มีขนาดครีบปีกยาว ${payload.flipper_length_mm} มม.<br><br>💡 <em>เกร็ดความรู้: ${avgNote}</em>`;
+
+        } catch (error) {
+            alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์หลังบ้านได้: ' + error.message);
+        } finally {
+            btnText.style.display = 'block';
+            spinner.style.display = 'none';
+            submitBtn.disabled = false;
+        }
+    });
+
+    // แอนิเมชันวิ่งตัวเลขตราชั่งดิจิตอล
+    function animateWeight(targetKg, targetG) {
+        let currentKg = 0;
+        const duration = 1000; // 1 วินาที
+        const stepTime = 20;   // อัปเดตทุก 20ms
+        const steps = duration / stepTime;
+        const increment = targetKg / steps;
+
+        const timer = setInterval(() => {
+            currentKg += increment;
+            if (currentKg >= targetKg) {
+                currentKg = targetKg;
+                clearInterval(timer);
+            }
+            weightVal.textContent = currentKg.toFixed(2);
+            weightGramsVal.textContent = `/ ${Math.round(currentKg * 1000)} กรัม (g)`;
+        }, stepTime);
+    }
+</script>
+</body>
+</html>

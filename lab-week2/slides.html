@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 CIT0013 Machine Learning Workshop - Lab 1 & 2 Slides</title>
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <!-- Reveal.js Dark Theme (modified by custom CSS) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+    <!-- Highlight.js Theme for Code Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/monokai.min.css">
+    
+    <!-- Google Fonts (Inter & Prompt) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Prompt:wght@200;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --r-main-font: 'Prompt', 'Inter', sans-serif;
+            --r-heading-font: 'Prompt', 'Inter', sans-serif;
+            --r-background-color: #0b132b;
+            --r-heading-color: #f8fafc;
+            --r-main-color: #cbd5e1;
+            --r-link-color: #00b4d8;
+            --r-link-color-hover: #90e0ef;
+            --accent-primary: #00b4d8;
+            --accent-gradient: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            --glass-bg: rgba(28, 37, 65, 0.65);
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .reveal {
+            font-family: var(--r-main-font);
+            color: var(--r-main-color);
+        }
+
+        .reveal h1 {
+            font-size: 2.4rem !important;
+            font-weight: 700;
+        }
+
+        .reveal h2 {
+            font-size: 1.45rem !important;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(0, 180, 216, 0.15);
+            padding-bottom: 0.3rem;
+            margin-bottom: 0.8rem !important;
+        }
+
+        .reveal h3 {
+            font-size: 1.15rem !important;
+            font-weight: 600;
+        }
+
+        .reveal h4 {
+            font-size: 0.9rem !important;
+            font-weight: 600;
+        }
+
+        .reveal p, .reveal li {
+            font-size: 0.68rem !important;
+            line-height: 1.55 !important;
+            color: var(--r-main-color);
+        }
+
+        .reveal ol, .reveal ul {
+            margin-left: 1.2rem !important;
+        }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+            font-family: var(--r-heading-font);
+            color: var(--r-heading-color);
+            text-transform: none;
+            word-wrap: break-word;
+        }
+
+        /* ตกแต่งพื้นหลังสไลด์หลัก */
+        .reveal .slides {
+            text-align: left;
+        }
+
+        .reveal .state-background {
+            background-color: var(--r-background-color);
+        }
+
+        /* กล่องสไตล์ Glassmorphism สำหรับ Slide */
+        .slide-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            margin-top: 0.4rem;
+        }
+
+        /* ตกแต่งโค้ด */
+        .reveal pre {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            width: 100%;
+            margin: 0.4rem 0;
+            font-size: 0.48em;
+            line-height: 1.35;
+        }
+
+        /* หัวข้อสีไล่เฉด */
+        .gradient-text {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        /* ป้ายประเภทแล็บ */
+        .lab-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .badge-classification {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-regression {
+            background-color: rgba(6, 214, 160, 0.2);
+            color: #06d6a0;
+            border: 1px solid rgba(6, 214, 160, 0.3);
+        }
+
+        .badge-core {
+            background-color: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            border: 1px solid rgba(0, 180, 216, 0.3);
+        }
+
+        /* ตารางเปรียบเทียบ */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .comparison-table th {
+            background: rgba(0, 180, 216, 0.15);
+            color: var(--accent-primary);
+            font-weight: 600;
+            padding: 0.8rem;
+            border-bottom: 2px solid var(--border-color);
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* กริดข้อมูลและไอคอน */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .grid-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+        }
+
+        .grid-item h4 {
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .grid-item p, .grid-item li {
+            font-size: 0.75rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        /* ปุ่มนำทาง */
+        .reveal .controls {
+            color: var(--accent-primary);
+        }
+
+        .reveal .progress {
+            color: var(--accent-primary);
+            height: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="reveal">
+    <div class="slides">
+        
+        <!-- สไลด์ 1: หน้าแรก -->
+        <section data-background-color="#0b132b">
+            <div style="text-align: center; margin-top: 2rem;">
+                <h3 style="letter-spacing: 2px; color: var(--accent-primary); font-size: 1.2rem; font-weight: 600;">CIT0013 MACHINE LEARNING</h3>
+                <h1 style="font-size: 3rem; font-weight: 700; margin: 1.5rem 0 0.5rem;">
+                    End-to-End <span class="gradient-text">ML Pipeline</span>
+                </h1>
+                <h2 style="font-size: 1.6rem; font-weight: 400; color: #94a3b8; margin-bottom: 3rem;">
+                    Lab 1 (Classification) & Lab 2 (Regression)
+                </h2>
+                <p style="font-size: 0.8rem; color: #64748b;">
+                    กดแป้นลูกศรทางขวา (→) บนคีย์บอร์ดเพื่อเริ่มต้นการนำเสนอสไลด์
+                </p>
+            </div>
+        </section>
+
+        <!-- สไลด์ 2: ภาพรวมเปรียบเทียบแล็บ -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-core">Overview</span>
+                <h2>เปรียบเทียบการแก้ปัญหาทางวิศวกรรมข้อมูล</h2>
+                <p style="font-size: 0.85rem; margin-bottom: 1rem;">สไลด์นี้เปรียบเทียบโจทย์ที่นักศึกษาจะได้เรียนรู้ในทั้ง 2 แล็บประกอบการเรียนการสอน:</p>
+                
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>มิติข้อเปรียบเทียบ</th>
+                            <th>Lab 1: Classification (จำแนกประเภท)</th>
+                            <th>Lab 2: Regression (ทำนายตัวเลขต่อเนื่อง)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>โจทย์ตัวอย่าง</strong></td>
+                            <td>ทำนายโอกาสรอดชีวิตของผู้โดยสารเรือ Titanic</td>
+                            <td>ทำนายน้ำหนักตัวจริงของนกเพนกวิน (กรัม)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ชนิดตัวแปรเป้าหมาย (Target)</strong></td>
+                            <td>ข้อมูลเชิงกลุ่ม (Categorical: 0 = เสียชีวิต, 1 = รอดชีวิต)</td>
+                            <td>ข้อมูลเชิงปริมาณต่อเนื่อง (Continuous: body_mass_g)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ชุดข้อมูล (Dataset)</strong></td>
+                            <td>Titanic Dataset จาก Seaborn (891 แถว)</td>
+                            <td>Penguins Dataset จาก Seaborn (344 แถว)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>สถาปัตยกรรมโมเดลหลัก</strong></td>
+                            <td>Logistic Regression, Decision Tree Classifier, Random Forest Classifier</td>
+                            <td>Linear Regression, Decision Tree Regressor, Random Forest Regressor</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- สไลด์ 3: 10-Step ML Pipeline -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-core">Workflow</span>
+                <h2>10 ขั้นตอนการทำ Machine Learning Pipeline</h2>
+                <div style="font-size: 0.8rem; line-height: 1.6; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
+                    <div>
+                        <strong style="color: var(--accent-primary);">ขั้นสำรวจและจัดเตรียม (Step 1-4)</strong>
+                        <ol style="padding-left: 1.2rem; margin-top: 0.5rem;">
+                            <li><strong>Setup & Imports:</strong> ติดตั้งและดึงคลังไลบรารี</li>
+                            <li><strong>Load Dataset:</strong> นำข้อมูลเข้าสู่ DataFrame</li>
+                            <li><strong>Quick Look:</strong> สำรวจค่านูลและสถิติเบื้องต้น</li>
+                            <li><strong>Train / Test Split:</strong> สุ่มแบ่งกลุ่มควบคุมวัดผล</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <strong style="color: #06d6a0;">ขั้นฝึกฝนและทดสอบ (Step 5-10)</strong>
+                        <ol style="padding-left: 1.2rem; margin-top: 0.5rem; start: 5;">
+                            <li value="5"><strong>Preprocessing Pipeline:</strong> จัดการค่าว่างและปรับสเกล</li>
+                            <li><strong>Compare Models:</strong> คัดเลือกโมเดลที่ดีที่สุดด้วย CV</li>
+                            <li><strong>Hyperparameter Tuning:</strong> จูนค่าเหมาะสมด้วย Grid Search</li>
+                            <li><strong>Evaluate on Test Set:</strong> ประเมินผลลัพธ์ด่านสุดท้าย</li>
+                            <li><strong>Feature Importance:</strong> ตรวจสอบอิทธิพลของแต่ละปัจจัย</li>
+                            <li><strong>Inference & Production:</strong> เซฟโมเดลและใช้งานทำนาย</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- สไลด์ 4: Step 1 Imports -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-core">Step 1</span>
+                <h2>การดึง Libraries และเครื่องมือสำหรับทั้ง 2 แล็บ</h2>
+                <p style="font-size: 0.8rem;">ในเวอร์ชันนี้เราย้ายคำสั่งนำเข้าทั้งหมดไปไว้ด้านบนสุดเพื่อให้โค้ดสะอาดตามระเบียบสากล:</p>
+                
+                <pre><code class="language-python"># ไลบรารีการจัดการตารางและสถิติ
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import joblib
+
+# เครื่องมือหลักฝั่งจำแนกประเภท (Lab 1) และทำนายตัวเลข (Lab 2)
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+
+# โมเดลและเกณฑ์วัดผล
+from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.metrics import accuracy_score, mean_absolute_error, r2_score
+                </code></pre>
+            </div>
+        </section>
+
+        <!-- สไลด์ 5: Step 2-3 Exploration -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-core">Step 2-3</span>
+                <h2>สำรวจข้อมูลเบื้องต้นและจุดข้อมูลสูญหาย (Quick Look)</h2>
+                <div class="grid-container">
+                    <div class="grid-item">
+                        <h4>🚢 Lab 1: Titanic Dataset</h4>
+                        <p style="margin-bottom: 0.5rem;"><strong>จุดข้อมูลสูญหายที่นักศึกษาต้องสังเกต:</strong></p>
+                        <ul>
+                            <li>คอลัมน์ `age` ขาดไป 177 แถว (ต้องใช้ Imputer เติมค่า)</li>
+                            <li>คอลัมน์ `deck` ขาดไป 688 แถว (>77% ของข้อมูลทั้งหมด)</li>
+                        </ul>
+                        <p style="margin-top: 0.5rem; color: #ef4444; font-style: italic;">
+                            *บทเรียน: ข้อมูลคอลัมน์ `deck` ขาดหายมากเกินกว่าจะช่วยประเมิน เราจึงตัดสินใจตัดทิ้งไปเพื่อป้องกันไม่ให้โมเดลมีอคติ
+                        </p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>🐧 Lab 2: Penguins Dataset</h4>
+                        <p style="margin-bottom: 0.5rem;"><strong>จุดข้อมูลสูญหายที่นักศึกษาต้องสังเกต:</strong></p>
+                        <ul>
+                            <li>คอลัมน์สรีระร่างกาย (ปาก/ปีก) ขาดไปเพียง 2 แถว</li>
+                            <li>คอลัมน์ระบุเพศ (`sex`) ขาดไป 11 แถว</li>
+                        </ul>
+                        <p style="margin-top: 0.5rem; color: #06d6a0; font-style: italic;">
+                            *บทเรียน: ข้อมูลส่วนใหญ่ค่อนข้างสมบูรณ์ เราลบแถวที่ target ขาดหาย และใช้ Pipeline แทนค่าว่างส่วนอื่นได้อย่างราบรื่น
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- สไลด์ 6: Step 4 Train / Test Split -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-core">Step 4</span>
+                <h2>ความต่างสำคัญในการสุ่มแบ่งกลุ่มข้อมูล (Train / Test Split)</h2>
+                <p style="font-size: 0.8rem; margin-bottom: 1rem;">การแบ่งข้อมูลเป็น 80% (ฝึกสอน) และ 20% (ทดสอบ) เพื่อทดสอบขีดความสามารถการใช้งานจริง:</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                    <div class="grid-item" style="padding: 0.6rem 1.2rem; background: rgba(255, 255, 255, 0.015);">
+                        <span class="lab-badge badge-classification" style="margin-bottom: 0.4rem;">Lab 1: Titanic (Classification)</span>
+                        <pre style="margin: 0.2rem 0;"><code class="language-python"># ต้องใส่ stratify เพื่อควบคุมสัดส่วนคลาสการรอด
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)</code></pre>
+                        <p style="margin-top: 0.2rem;"><strong>ทำไมต้องใช้ stratify=y?</strong> เพื่อรักษาสัดส่วนผู้โดยสารรอดชีวิตเฉลี่ยให้เท่ากันในชุดข้อมูลทั้งสองกลุ่ม (~38% รอด) ป้องกันปัญหาอคติของโมเดล</p>
+                    </div>
+                    <div class="grid-item" style="padding: 0.6rem 1.2rem; background: rgba(255, 255, 255, 0.015);">
+                        <span class="lab-badge badge-regression" style="margin-bottom: 0.4rem;">Lab 2: Penguins (Regression)</span>
+                        <pre style="margin: 0.2rem 0;"><code class="language-python"># ไม่ต้องใส่ stratify เพราะข้อมูลต่อเนื่องเชิงตัวเลข
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</code></pre>
+                        <p style="margin-top: 0.2rem;"><strong>ทำไมไม่ต้องใช้ stratify?</strong> เนื่องจากข้อมูลเป้าหมายคือน้ำหนักในหน่วยกรัม (Continuous Variable) จึงไม่มีกลุ่มคลาสที่แน่นอนในการสุ่มเกลี่ยสัดส่วน</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- สไลด์ 7: Step 5 Preprocessing Pipeline -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-core">Step 5</span>
+                <h2>การจัดท่อเตรียมข้อมูล (Preprocessing Pipeline)</h2>
+                <p style="font-size: 0.8rem; margin-bottom: 0.8rem;">การจัดสรรชุดคอลัมน์ตามหมวดหมู่เพื่อส่งผ่านท่อกรองข้อมูลย่อยที่แตกต่างกันด้วย [ColumnTransformer]:</p>
+                
+                <pre><code class="language-python"># จัดท่อสำหรับข้อมูลตัวเลข (Numeric Transformer)
+numeric_transformer = Pipeline(steps=[
+    ("imputer", SimpleImputer(strategy="median")),  # เติมค่าว่างด้วยค่ากลาง (มัธยฐาน)
+    ("scaler", StandardScaler())                    # ปรับขนาดข้อมูลให้มีความเบี่ยงเบนมาตรฐานเป็น 1
+])
+
+# จัดท่อสำหรับข้อมูลหมวดหมู่ (Categorical Transformer)
+categorical_transformer = Pipeline(steps=[
+    ("imputer", SimpleImputer(strategy="most_frequent")), # เติมค่าว่างด้วยค่าฐานนิยม
+    ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)) # แปลงเป็นเลข 0 และ 1
+])
+
+# รวบรวมท่อทั้งสองเข้าด้วยกันตามกลุ่มคอลัมน์ฟีเจอร์ที่ระบุ
+preprocessor = ColumnTransformer(transformers=[
+    ("num", numeric_transformer, numeric_features),
+    ("cat", categorical_transformer, categorical_features)
+])
+                </code></pre>
+            </div>
+        </section>
+
+        <!-- สไลด์ 8: pclass design decision -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-classification">Lab 1 Insight</span>
+                <h2>การตัดสินใจออกแบบ: กรณีศึกษาตัวแปร `pclass`</h2>
+                <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem;">
+                    ตัวแปร `pclass` (ระดับชั้นตั๋วผู้โดยสาร 1, 2, 3) ใน Titanic มีลักษณะเป็นข้อมูลเชิงอันดับ (Ordinal Data)
+                </p>
+                <div class="grid-container">
+                    <div class="grid-item">
+                        <h4 style="color: #ef4444;">แนวทางแบบ Nominal (One-Hot)</h4>
+                        <p>หากแปลง `pclass` เป็น One-Hot จะแตกออกเป็น 3 คอลัมน์อิสระกันได้แก่ `pclass_1`, `pclass_2`, `pclass_3` 
+                        และมีค่า 0 หรือ 1 ขาดความต่อเนื่องเชิงมิติ</p>
+                        <p style="margin-top: 0.5rem; color: var(--text-muted);"><strong>ผลลัพธ์:</strong> สูญเสียระดับความสัมพันธ์ของชั้นตั๋ว (ตัวอย่างเช่น ตั๋วชั้น 1 มีสิทธิรอดสูงกว่าชั้น 3)</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4 style="color: #06d6a0;">แนวทางแบบ Ordinal (Numeric Scaling)</h4>
+                        <p>ในเวอร์ชัน v2 โค้ดย้าย `pclass` มาประมวลผลในท่อนิวเมอริก เพื่อผ่านการทำ `StandardScaler` เพื่อปรับขนาดค่าช่วงความกว้าง</p>
+                        <p style="margin-top: 0.5rem; color: var(--text-muted);"><strong>ผลลัพธ์:</strong> รักษามิติเชิงอันดับและทิศทางของข้อมูล (1 < 2 < 3) ส่งผลให้แบบจำลองเชิงเส้นเรียนรู้ค่าน้ำหนักได้แม่นยำยิ่งขึ้น</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- สไลด์ 9: Step 6 Model Comparison -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-core">Step 6</span>
+                <h2>เปรียบเทียบหาแชมป์โมเดลหลักด้วย Cross-Validation</h2>
+                <p style="font-size: 0.8rem; margin-bottom: 1rem;">การประเมินเพื่อลดความลำเอียงผ่านการแบ่งทดสอบความถูกต้อง 5 ส่วน (5-fold Cross-Validation):</p>
+                
+                <div class="grid-container">
+                    <div class="grid-item">
+                        <span class="lab-badge badge-classification">Lab 1: Classification (Accuracy)</span>
+                        <p>ใช้อัตราคะแนนความถูกต้องเฉลี่ย (Accuracy) ในการเปรียบเทียบประสิทธิภาพ</p>
+                        <p style="margin-top: 0.5rem; color: var(--text-main); font-weight: 500;">
+                            ผลรันเฉลี่ยสะสม:<br>
+                            - Logistic Regression : 0.796<br>
+                            - Decision Tree : 0.784<br>
+                            - Random Forest : 0.796<br>
+                            *โมเดลดีที่สุดรอบนี้: Random Forest (0.796)*
+                        </p>
+                    </div>
+                    <div class="grid-item">
+                        <span class="lab-badge badge-regression">Lab 2: Penguins (MAE)</span>
+                        <p>ใช้อัตราความคลาดเคลื่อนสัมบูรณ์เฉลี่ย (MAE - กรัม) ในการเทียบหาตัวที่คลาดเคลื่อนต่ำที่สุด</p>
+                        <p style="margin-top: 0.5rem; color: var(--text-main); font-weight: 500;">
+                            ผลรันเฉลี่ยสะสม (ยิ่งน้อยยิ่งเก่ง):<br>
+                            - Linear Regression : MAE = 233.89g<br>
+                            - Decision Tree Regressor : MAE = 336.36g<br>
+                            - Random Forest Regressor : MAE = 253.24g<br>
+                            *โมเดลดีที่สุดรอบนี้: Linear Regression (233.89g)*
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- สไลด์ 10: Step 7 Hyperparameter Tuning -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-core">Step 7</span>
+                <h2>การปรับจูนพารามิเตอร์ของโมเดลตัวที่เก่งสุด (GridSearchCV)</h2>
+                <p style="font-size: 0.8rem; margin-bottom: 0.8rem;">ในเวอร์ชัน v2 โค้ดจะดึงคลาสโมเดลและเลือกชุดตารางจูนพารามิเตอร์ให้ตรงกับตัวที่ชนะใน Step 6 แบบอัตโนมัติ (Dynamic Tuning):</p>
+                
+                <pre><code class="language-python"># กำหนดพารามิเตอร์แยกตามกลุ่มโมเดลหลัก
+param_grids = {
+    "Logistic Regression": {"model__C": [0.01, 0.1, 1.0, 10.0]},
+    "Random Forest":       {"model__n_estimators": [50, 100, 200], "model__max_depth": [None, 5, 10]}
+}
+
+# ดึงข้อมูลมาจับคู่เพื่อส่งต่อเข้าท่อส่ง Grid
+best_model_class = type(models[best_model_name])
+selected_grid = param_grids.get(best_model_name, param_grids["Random Forest"])
+
+final_pipe = Pipeline(steps=[
+    ("preprocessor", preprocessor),
+    ("model", best_model_class(random_state=42))
+])
+
+grid_search = GridSearchCV(final_pipe, selected_grid, cv=5, scoring="accuracy")
+grid_search.fit(X_train, y_train)
+                </code></pre>
+            </div>
+        </section>
+
+        <!-- สไลด์ 11: Step 8 Evaluation Classification -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-classification">Lab 1 (Step 8)</span>
+                <h2>ประเมินผลลัพธ์สุดท้าย: สถิติ Classification</h2>
+                <p style="font-size: 0.8rem; margin-bottom: 1rem;">การวิเคราะห์แบบจำลอง Titanic ด้วย Confusion Matrix และรายงานผลสถิติ:</p>
+                
+                <div class="grid-container">
+                    <div class="grid-item">
+                        <h4>📊 ตารางสถิติผู้โดยสารในกลุ่มทดสอบ (Test Set)</h4>
+                        <p style="margin-top: 0.5rem; font-size: 0.75rem; line-height: 1.6;">
+                            - <strong>True Negative (TN):</strong> ทำนายเสียชีวิต และเสียชีวิตจริง = 103 คน<br>
+                            - <strong>False Positive (FP):</strong> ทำนายรอดชีวิต แต่ผลจริงคือเสียชีวิต = 7 คน<br>
+                            - <strong>False Negative (FN):</strong> ทำนายเสียชีวิต แต่ผลจริงคือรอดชีวิต = 29 คน<br>
+                            - <strong>True Positive (TP):</strong> ทำนายรอดชีวิต และรอดชีวิตจริง = 40 คน
+                        </p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>🧩 ความสำคัญของ Precision และ Recall</h4>
+                        <p style="margin-top: 0.5rem; font-size: 0.75rem; line-height: 1.6;">
+                            - <strong>Precision (คลาสคนรอดชีวิต = 85%):</strong> ในกลุ่มคนที่โมเดลพยากรณ์ว่ารอดชีวิต โมเดลคาดเดาได้ตรงกับความจริง 85%<br>
+                            - <strong>Recall (คลาสคนรอดชีวิต = 58%):</strong> จากผู้รอดชีวิตทั้งหมดในเรือ โมเดลสแกนตามตัวเจอเพียง 58% เท่านั้น
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- สไลด์ 12: Step 8 Evaluation Regression -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-regression">Lab 2 (Step 8)</span>
+                <h2>ประเมินผลลัพธ์สุดท้าย: สถิติ Regression</h2>
+                <p style="font-size: 0.8rem; margin-bottom: 1rem;">การวิเคราะห์ความคลาดเคลื่อนในการพยากรณ์ค่าน้ำหนัก (Penguins Weight):</p>
+                
+                <div class="grid-container" style="grid-template-columns: 1fr;">
+                    <div class="grid-item">
+                        <h4>📊 ตัวชี้วัดประสิทธิภาพสถิติ Regression บนชุดทดสอบ</h4>
+                        <p style="margin-top: 0.5rem; font-size: 0.8rem; line-height: 1.6;">
+                            - <strong>Mean Absolute Error (MAE):</strong> 232.24 กรัม (โมเดลพยากรณ์คลาดเคลื่อนไปจากน้ำหนักจริงโดยเฉลี่ยประมาณ +/- 232.24 กรัม)<br>
+                            - <strong>Root Mean Squared Error (RMSE):</strong> 286.68 กรัม (ช่วยทำโทษจุดที่พยากรณ์พลาดรุนแรง)<br>
+                            - <strong>R-squared (R2 Score):</strong> 0.876 หรือ 87.6% (บ่งบอกว่าตัวแปรสรีระของนกเพนกวินที่เรานำมาใช้ สามารถอธิบายสาเหตุความผันแปรของค่าน้ำหนักตัวจริงได้ถึง 87.6%!)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- สไลด์ 13: Step 9 Feature Importance & Coefficients -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-core">Step 9</span>
+                <h2>การวิเคราะห์ปัจจัยและถอดรหัสโมเดลอย่างปลอดภัย</h2>
+                <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">ในเวอร์ชัน v2 โค้ดจะใช้ฟังก์ชันตรวจสอบสถาปัตยกรรมโมเดลอย่างปลอดภัยด้วยเงื่อนไข `hasattr()`:</p>
+                
+                <pre><code class="language-python"># 1) ตรวจสอบความเข้ากันได้ของสถาปัตยกรรมเพื่อป้องกันโมเดลแครช
+if hasattr(model, "feature_importances_"):
+    importances = model.feature_importances_  # สำหรับโมเดลประเภท Tree (RF, DT)
+elif hasattr(model, "coef_"):
+    importances = np.abs(model.coef_).flatten()  # สำหรับโมเดลเชิงเส้น (Logistic/Linear)
+else:
+    importances = None
+
+# 2) สถิติจากการรันวิเคราะห์จริง:
+# - สำหรับ Titanic: "เพศหญิง" (sex_female) เป็นตัวแปรที่มีอิทธิพลรอดสูงสุด
+# - สำหรับ Penguins: "สายพันธุ์ Gentoo" (species_Gentoo) ได้รับสัมประสิทธิ์สูงสุด (+2022 กรัม) 
+#   เนื่องจากทางชีววิทยา Gentoo เป็นสายพันธุ์นกเพนกวินที่มีขนาดใหญ่และหนักที่สุด
+                </code></pre>
+            </div>
+        </section>
+
+        <!-- สไลด์ 14: Step 9.5 & 10 Production -->
+        <section>
+            <div class="slide-container">
+                <span class="lab-badge badge-core">Step 9.5 & 10</span>
+                <h2>การส่งผ่านระบบและการนำโมเดลไปใช้งานจริง (Production)</h2>
+                <p style="font-size: 0.8rem;">ในการผลิตซอฟต์แวร์จริง เราจำเป็นต้องสร้างระบบที่มีความเสถียรและทนทาน:</p>
+                
+                <div style="font-size: 0.75rem; line-height: 1.6; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
+                    <div class="grid-item">
+                        <strong style="color: var(--accent-primary);">1. Model Serialization (joblib)</strong>
+                        <p style="margin-top: 0.5rem;">การฝึกสอนโมเดล (Training) ใช้พลังงานสูงและเวลามาก ในงานทำนายหลังบ้าน เราจึงบันทึกผลการจูนเก็บเป็นไฟล์รูปเล่ม `.joblib` แล้วเปิดคำสั่ง `joblib.load()` เพื่อนำมาพยากรณ์ผลลัพธ์ใหม่ได้ทันทีโดยไม่ต้องรันเทรนซ้ำ</p>
+                    </div>
+                    <div class="grid-item">
+                        <strong style="color: #06d6a0;">2. Input Validation</strong>
+                        <p style="margin-top: 0.5rem;">สร้างฟังก์ชันด่านคัดกรองข้อมูลขาเข้า เช่น `validate_passenger_input()` และ `validate_penguin_input()` คอยแจ้งเตือนและสกรีนตัวแปรแปลกปลอมหรือค่าว่างก่อนส่งเข้าสู่แบบจำลองคณิตศาสตร์ ป้องกันระบบหยุดทำงานกลางคัน</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- สไลด์ 15: สรุปและประเด็นชวนคิด -->
+        <section data-background-color="#0b132b">
+            <div class="slide-container">
+                <span class="lab-badge badge-core">Summary</span>
+                <h2>สรุปเนื้อหาแล็บและประเด็นศึกษาเพิ่มเติม</h2>
+                <div class="grid-container">
+                    <div class="grid-item">
+                        <h4>💡 สิ่งสำคัญที่ได้เรียนรู้</h4>
+                        <ul style="padding-left: 1rem; margin-top: 0.5rem; font-size: 0.7rem; line-height: 1.5;">
+                            <li><strong>Pipeline:</strong> ช่วยจัดการท่อส่งอย่างปลอดภัยไม่เกิด Data Leakage</li>
+                            <li><strong>Cross-Validation:</strong> ประเมินผลมั่นคงกว่าการแบ่งสุ่มเดี่ยว</li>
+                            <li><strong>GridSearchCV:</strong> ค้นหารุ่นพารามิเตอร์ดีที่สุดอัตโนมัติ</li>
+                            <li><strong>Evaluation:</strong> เข้าใจความต่างของค่าวัด Classification และ Regression</li>
+                        </ul>
+                    </div>
+                    <div class="grid-item">
+                        <h4>🚀 กิจกรรมท้าทายให้ศึกษาต่อ</h4>
+                        <ul style="padding-left: 1rem; margin-top: 0.5rem; font-size: 0.7rem; line-height: 1.5;">
+                            <li>ลองใช้ฟีเจอร์อื่นๆ เพิ่ม เช่น `sibsp`, `parch` ใน Titanic</li>
+                            <li>ศึกษาเปรียบเทียบโมเดลประเภทอื่นๆ เช่น KNN, SVM</li>
+                            <li>ฝึกการเติมค่าว่างด้วยเทคนิคขั้นสูงอย่าง `KNNImputer`</li>
+                            <li>ลองพัฒนาเชื่อมโยงปัญญาประดิษฐ์ขึ้นระบบ Cloud API</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<!-- Reveal.js & Plugins via CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+<script>
+    // เริ่มต้นใช้งาน Reveal.js และกำหนดการตั้งค่าเบื้องต้น
+    Reveal.initialize({
+        hash: true,
+        controls: true,
+        progress: true,
+        center: true,
+        transition: 'slide', // แอนิเมชันเปลี่ยนหน้า: slide/fade/convex/concave/zoom
+        plugins: [ RevealHighlight ]
+    });
+</script>
+</body>
+</html>
